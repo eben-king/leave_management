@@ -7,6 +7,17 @@ if(strlen($_SESSION['staffid'])==0)
 header('location:index.php');
 }
 else{
+    $staffid = $_SESSION['staffid'];
+    $sql ="SELECT * FROM tblemployees
+    join tblpolicy
+    on tblemployees.policy = tblpolicy.id
+    WHERE staffid=:staffid";
+    $query= $dbh -> prepare($sql);
+    $query-> bindParam(':staffid', $staffid, PDO::PARAM_STR);
+    $query-> execute();
+    $results=$query->fetchAll(PDO::FETCH_OBJ);
+    if($query->rowCount() > 0){
+    foreach ($results as $result) {
 
 ?>
 <!DOCTYPE html>
@@ -68,6 +79,38 @@ else{
                                         <div class="card-content collapse show">
                                             <div class="card-body">
                                                 <h1>Welcome <?php echo $_SESSION['uname'] ?></h1>
+                                                <h2>
+                                                    <?php
+                                                    $to_date = date('d-m-Y');
+                                                    $from_time = strtotime($result->regdate);
+                                                    $from_date = date("d-m-Y", $from_time);
+                                                    $diff = strtotime($to_date) - strtotime($from_date);
+                                                    $num_days = abs(round($diff/86400));
+                                                    if (($num_days >364) && (($num_days%365==0) || ($num_days%366==0))) {
+                                                        $sql = "update tblemployees set cl_used=0, tbal=tbal+(select nold from tblpolicy 
+                                                        WHERE id=(select policy from tblemployees where staffid=:staffid))
+                                                        where staffid=:staffid";
+                                                        $query= $dbh -> prepare($sql);
+                                                        $query-> bindParam(':staffid', $staffid, PDO::PARAM_STR);
+                                                        $query-> execute();
+                                                        echo "You were added additional leave";
+                                                    }elseif($num_days>=365) {
+                                                        $nold = $result->nold;
+                                                        if ($result->opbal==0){
+                                                            $sql = "update tblemployees set opbal=:opbal, cl_used=0, tbal=:opbal
+                                                            where staffid=:staffid";
+                                                            $query= $dbh -> prepare($sql);
+                                                            $query-> bindParam(':staffid', $staffid, PDO::PARAM_STR);
+                                                            $query-> bindParam(':opbal', $nold, PDO::PARAM_INT);
+                                                            $query-> execute();
+                                                        }
+                                                        echo "You are entitled to $nold leave days";
+                                                    } else {
+                                                        echo "You are not entitled any number of leave days yet<br/>";
+                                                        echo "You will be entitled to leave days after a year of working";
+                                                    }
+                                                     ?>
+                                                </h2>
 
                                                 <p>Here is where to manage your details as an employee. With the tabs on the left-sidebar, you can view, edit and delete your account without any difficulty.</p>
                                                 <p>Also included are the ability to view your leave requests such as recommended leaves, accepted leaves, rejected leaves, in addition to being able to request for new leaves - all at the comfort of your home or on the go.</p>
@@ -91,4 +134,4 @@ else{
   </body>
 
 </html>
-<?php } ?>
+<?php }}} ?>

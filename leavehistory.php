@@ -70,7 +70,8 @@ else{
                                             <tbody>
                                             <?php
                                             $staffid=$_SESSION['staffid'];
-                                            $sql = "SELECT id,dlc, dle, doff, `status` from tblleaves where staffid=:staffid";
+                                            $sql = "SELECT id,dlc, dle, doff, `status` from tblleaves where staffid=:staffid
+                                            ORDER BY dlc DESC";
                                             $query = $dbh -> prepare($sql);
                                             $query->bindParam(':staffid',$staffid,PDO::PARAM_STR);
                                             $query->execute();
@@ -89,7 +90,7 @@ else{
                                                             }if($stats==1){?>
                                                                 <span style="color: blue">Waiting for HOD Approval</span> <?php
                                                             } if($stats==2){ ?>
-                                                                <span style="color: violet">Waiting for Registrar's Approval</span> <?php
+                                                                <span style="color: violet">HOD has approved. Waiting for Registrar's Approval</span> <?php
                                                             } if($stats==3){ ?>
                                                                 <span style="color: green">Aprroved</span> <?php
                                                             } if($stats==4){ ?>
@@ -98,7 +99,8 @@ else{
                                                         <td>
                                                             <?php
                                                                 if ($result->status ==1 || $result->status==4) { ?>
-                                                            <a href="updateleave.php?lid=<?php echo htmlentities($result->id);?>"><i>Update Leave</i></a><a href="leavehistory.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to cancel leave?');"> <i class="material-icons">Delete Leave</i></a>
+                                                            <a style="color: green;" href="updateleave.php?lid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Confirm update of leave?');"><i>Update Leave</i></a><br>
+                                                            <a style="color: red;" href="leavehistory.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to cancel leave?');"> <i class="fa fa-check-square-o">Delete Leave</i></a>
                                                             <?php } ?>
                                                         </td>
                                                     </tr>

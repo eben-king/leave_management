@@ -50,7 +50,7 @@ if(strlen($_SESSION['staffid'])==0) {
     <?php include_once('includes/header.php');?>
     <title>Request Leave</title>
 </head>
-<body onload="totalLeave()" class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-col="2-columns">
+<body class="vertical-layout vertical-menu 2-columns   menu-expanded fixed-navbar" data-open="click" data-menu="vertical-menu" data-col="2-columns">
 
 <!-- Navigation bar -->
 <?php include('includes/navbar.php');?>
@@ -115,37 +115,45 @@ if(strlen($_SESSION['staffid'])==0) {
                                                             <input type="date" name="dopl" id="dopl" class="form-control">
                                                             </div>
 
-                                                        <?php } 
-                                                        if ($result->ol_set ==1) {?>
+                                                        <?php } ?>
                                                         <div class="form-group">
                                                             <label for="ol">Outstanding Leave</label>
                                                             <input type="number" name="ol" id="ol" class="form-control" readonly value="<?php echo htmlentities($result->ol);?>">
                                                         </div>
-                                                        <?php } else { ?>
-                                                        <div class="form-group">
-                                                            <label for="ol">Outstanding Leave</label>
-                                                            <input type="number" name="ol" id="ol" class="form-control" oninput="totalLeave()">
-                                                        </div>
-                                                        <?php }  ?>
+                                                        <?php if ($result->cl_used ==1) { ?>
                                                         <div class="form-group">
                                                             <label for="cl">Current Leave</label>
-                                                            <input type="number" name="cl" id="cl" class="form-control" value="<?php echo htmlentities($result->nold);?>" readonly>
-                                                        </div>
+                                                            <input type="number" name="cl" id="cl" class="form-control" value="0" readonly>
+                                                        </div> <?php }else { ?>
+                                                            <div class="form-group">
+                                                                <label for="cl">Current Leave</label>
+                                                                <input type="number" name="cl" id="cl" class="form-control" value="<?php echo htmlentities($result->nold);?>" readonly>
+                                                            </div> <?php } ?>
+                                                            <?php if ($result->cl_used ==1) { ?>
                                                         <div class="form-group">
                                                             <label for="tle">Total Leave Earned</label>
-                                                            <input type="number" name="tle" id="tle" class="form-control" readonly>
+                                                            <input type="number" name="tle" id="tle" class="form-control" value="<?php echo htmlentities($result->ol);?>" readonly>
+                                                            <div class="form-group">
+                                                                <label for="ldr">Leave Days Requested</label>
+                                                                <input type="number" min="1" max="<?php echo htmlentities($result->ol);?>"  name="ldr" id="ldr" class="form-control" oninput="myFunc()" required>
+                                                            </div>
+                                                        </div><?php }else { ?>
+                                                        <div class="form-group">
+                                                            <label for="tle">Total Leave Earned</label>
+                                                            <input type="number" name="tle" id="tle" class="form-control" value="<?php echo htmlentities($result->tbal);?>" readonly>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="ldr">Leave Days Requested</label>
-                                                            <input type="number" max="40" name="ldr" id="ldr" class="form-control" oninput="myFunc()">
+                                                            <input type="number" min="1" max="<?php echo htmlentities($result->tbal);?>"  name="ldr" id="ldr" class="form-control" oninput="myFunc()" required>
                                                         </div>
+                                                        <?php } ?>
                                                         <div>
                                                             <label for="lafcy">Leave Approved For Current Year</label>
                                                             <input type="number" name="lafcy" id="lafcy" class="form-control" value="<?php echo htmlentities($result->ldafcy);?>" readonly>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="dlc">Date Leave Commences</label>
-                                                            <input type="date" name="dlc" id="dlc" class="form-control" onchange="myFunc()">
+                                                            <input type="date" name="dlc" id="dlc" class="form-control" onchange="myFunc()" required>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="dle">Date Leave Ends</label>
@@ -216,13 +224,6 @@ if(strlen($_SESSION['staffid'])==0) {
                                                 } 
                                                 return $date;
                                             }
-
-                                            function totalLeave() {
-                                                var ol =parseInt(document.getElementById('ol').value);
-                                                var cl =parseInt(document.getElementById('cl').value);
-                                                $total = ol+cl
-                                                document.getElementById('tle').value=$total;
-                                            }
                                         </script>
                         
                                     </div>
@@ -279,7 +280,7 @@ if(strlen($_SESSION['staffid'])==0) {
                                                             }if($stats==1){?>
                                                                 <span style="color: blue">Waiting for HOD Approval</span> <?php
                                                             } if($stats==2){ ?>
-                                                                <span style="color: violet">Waiting for Registrar's Approval</span> <?php
+                                                                <span style="color: violet">HOD has approved. Waiting for Registrar's Approval</span> <?php
                                                             } if($stats==3){ ?>
                                                                 <span style="color: green">Aprroved</span> <?php
                                                             } if($stats==4){ ?>

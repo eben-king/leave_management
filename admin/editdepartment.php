@@ -13,7 +13,14 @@ if(isset($_POST['update'])) {
     $deptname=$_POST['deptname'];
     $deptshortname=$_POST['deptshortname'];
     $hod=$_POST['hod'];
-    $sql="update tbldepartments set school=:school, hod=:hod, deptname=:deptname, deptshortname=:deptshortname where id=:did";
+    $sql="begin;
+    update tblemployees set role=1
+    where department=:did;
+    update tblemployees set role=2
+    where id=:hod;
+    update tbldepartments set school=:school, hod=:hod, deptname=:deptname, deptshortname=:deptshortname 
+    where id=:did;
+    commit";
     $query = $dbh->prepare($sql);
     $query->bindParam(':school',$school,PDO::PARAM_INT);
     $query->bindParam(':hod',$hod,PDO::PARAM_INT);
@@ -27,7 +34,7 @@ if(isset($_POST['update'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+<head>
         <!-- Header Menu -->
         <?php include_once('includes/header.php');?>
         <title>Add School</title>
@@ -51,7 +58,7 @@ if(isset($_POST['update'])) {
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h4 class="card-title" id="basic-layout-form">User Password</h4>
+                                        <h4 class="card-title" id="basic-layout-form"></h4>
                                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                                         <div class="heading-elements">
                                             <ul class="list-inline mb-0">
@@ -68,7 +75,7 @@ if(isset($_POST['update'])) {
                                             else if($msg){?><div class="succWrap"><strong>SUCCESS</strong> : <?php echo htmlentities($msg); ?> </div><?php }?>
                                             <form class="form" method="POST" action="">
                                                 <div class="form-body">
-                                                    <h4 class="form-section"><i class="ft-user"></i>Edit School Info</h4>
+                                                    <h4 class="form-section"><i class="ft-user"></i>Edit Department Info</h4>
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <?php

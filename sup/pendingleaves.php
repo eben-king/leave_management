@@ -72,6 +72,9 @@ else{
                                                 <thead>
                                                 <tr>
                                                     <th>No.</th>
+                                                    <?php if(isset($_SESSION['hrid'])){ ?>
+                                                        <th>Department</th>
+                                                    <?php } ?>
                                                     <th>Employee Name</th>
                                                     <th>Leave Start Date</th>
                                                     <th>Leave End Date</th>
@@ -82,14 +85,20 @@ else{
                                                 <tbody>
                                                 <?php
                                                 if(isset($_SESSION['hrid'])){
-                                                    $sql1 = "SELECT l.id as id, concat(fname, ' ', lname) as fullname, dlc, dle, `status` from tblemployees as e
-                                                    join tblleaves as l on l.staffid = e.staffid status=2";
+                                                    $sql1 = "SELECT d.deptname, l.id as id, concat(fname, ' ', lname) as fullname, dlc, dle, `status` from tblemployees as e
+                                                    join tblleaves as l 
+                                                    on l.staffid = e.staffid
+                                                    JOIN tbldepartments as d
+                                                    on d.id=e.department
+                                                    where status=2
+                                                    ORDER BY department, dlc";
                                                     $query1 = $dbh -> prepare($sql1);
                                                 }else {
                                                     $hodid = $_SESSION['hodid'];
                                                     $sql1 = "SELECT l.id as id, concat(fname, ' ', lname) as fullname, dlc, dle, `status` from tblemployees as e
                                                     join tblleaves as l on l.staffid = e.staffid where status=1 and
-                                                    department=(SELECT department FROM tblemployees WHERE staffid=:hodid)";
+                                                    department=(SELECT department FROM tblemployees WHERE staffid=:hodid)
+                                                    order by dlc";
                                                     $query1 = $dbh -> prepare($sql1);
                                                     $query1->bindParam(':hodid',$hodid,PDO::PARAM_STR);
                                                 }
@@ -100,31 +109,17 @@ else{
                                                     foreach($results1 as $result){  ?>
                                                         <tr>
                                                             <td> <?php echo htmlentities($cnt1);?></td>
+                                                            <?php if(isset($_SESSION['hrid'])){ ?>
+                                                            <td><?php echo htmlentities($result->deptname);?></td>
+                                                            <?php } ?>
                                                             <td><?php echo htmlentities($result->fullname);?></td>
                                                             <td><?php echo htmlentities($result->dlc);?></td>
                                                             <td><?php echo htmlentities($result->dle);?></td>
-                                                            <td><?php $stats=$result->status;
-                                                                if($stats==0){?>
-                                                                    <span style="color: red">Not Approved</span> <?php
-                                                                }if($stats==1){?>
-                                                                    <span style="color: blue">Waiting for HOD Approval</span> <?php
-                                                                } if($stats==2){ ?>
-                                                                    <span style="color: violet">Waiting for Registrar's Approval</span> <?php
-                                                                } if($stats==3){ ?>
-                                                                    <span style="color: green">Aprroved</span> <?php
-                                                                } if($stats==4){ ?>
-                                                                    <span style="color: pink">Ammended</span> <?php
-                                                                } ?> </td>
+                                                            <td><span style="color: blue">Waiting for your Approval</span></td>
                                                             <td>
-                                                                <?php if (isset($_SESSION['hodid']) && $result->status==1) { ?>
-                                                                    <a href="leaves.php?recid=<?php echo htmlentities($result->id);?>"><i class="material-icons">Recommend</i></a>
-                                                                    <a href="updateleave.php?lid=<?php echo htmlentities($result->id);?>"><i class="material-icons">Amend Leave</i></a>
-                                                                    <a href="leaves.php?notid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to reject leave?');"> <i class="material-icons">Not Recommend</i></a>
-                                                                <?php }else if (isset($_SESSION['hrid']) && $result->status==2){ ?>
-                                                                    <a href="leaves.php?recid=<?php echo htmlentities($result->id);?>"><i class="material-icons">Recommend</i></a>
-                                                                    <a href="updateleave.php?lid=<?php echo htmlentities($result->id);?>"><i class="material-icons">Amend Leave</i></a>
-                                                                    <a href="leaves.php?notid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to reject leave?');"> <i class="material-icons">Not Recommend</i></a>
-                                                                <?php } ?>
+                                                                <a style="color: green;" href="leaves.php?recid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to recommend leave?');"><i class="material-icons">Recommend</i></a><br>
+                                                                <a style="color: purple;" href="updateleave.php?lid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to amend leave?');"><i class="material-icons">Amend Leave</i></a><br>
+                                                                <a style="color: red;" href="leaves.php?notid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to reject leave?');"> <i class="material-icons">Not Recommend</i></a>
                                                             </td>
                                                         </tr>
                                                         <?php $cnt1++;} }?>

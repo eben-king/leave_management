@@ -64,8 +64,9 @@ if(strlen($_SESSION['alogin'])==0){
                                                     <th>Action</th>
                                                 </thead>
                                                     <tbody>
-                                                    <?php $sql = "select d.id as id, deptname, deptshortname, schoolname, concat(fname, ' ', lname) as hod from tblemployees as e, tbldepartments as d, tblschools as s
-                                                    where d.hod = e.id and s.id = d.school;";
+                                                    <?php $sql = "select d.id as id, deptname, deptshortname, schoolname, concat(fname, ' ', lname) as hod from tblemployees as e
+                                                    join tbldepartments as d on d.hod = e.id
+                                                    join tblschools as s on s.id = d.school;";
                                                     $query = $dbh -> prepare($sql);
                                                     $query->execute();
                                                     $results=$query->fetchAll(PDO::FETCH_OBJ);

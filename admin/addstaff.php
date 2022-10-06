@@ -8,10 +8,12 @@ if(strlen($_SESSION['alogin'])==0) {
     if(isset($_POST['add'])) {
         $staffid=$_POST['staffid'];
         $fname=$_POST['fname'];
+        $regdate=$_POST['regdate'];
         $lname=$_POST['lname'];
         $position=$_POST['position'];
         $department=$_POST['department'];
         $address=$_POST['address'];
+        $ol=$_POST['ol'];
         $phone=$_POST['phone'];
         $email=$_POST['email'];
         $password=md5($_POST['password']);
@@ -23,18 +25,20 @@ if(strlen($_SESSION['alogin'])==0) {
         if ($_POST['department']!=0) {
 
             try {
-                $sql="INSERT INTO tblemployees(staffid, fname, lname, `position`, department, address, phone, email, password, policy)
-                VALUES(:staffid, :fname, :lname, :position, :department, :address, :phone, :email, :password, :policy)";
+                $sql="INSERT INTO tblemployees(staffid, fname, lname, `position`, department, address, phone, email, ol, password, policy, regdate, role)
+                VALUES(:staffid, :fname, :lname, :position, :department, :address, :phone, :email, :ol, :password, :policy, :regdate, 1)";
                 $query = $dbh->prepare($sql);
                 $query->bindParam(':staffid',$staffid,PDO::PARAM_STR);
                 $query->bindParam(':fname',$fname,PDO::PARAM_STR);
                 $query->bindParam(':lname',$lname,PDO::PARAM_STR);
                 $query->bindParam(':position',$position,PDO::PARAM_STR);
                 $query->bindParam(':department',$department,PDO::PARAM_INT);
+                $query->bindParam(':ol',$ol,PDO::PARAM_INT);
                 $query->bindParam(':address',$address,PDO::PARAM_STR);
                 $query->bindParam(':phone',$phone,PDO::PARAM_STR);
                 $query->bindParam(':email',$email,PDO::PARAM_STR);
                 $query->bindParam(':password',$password,PDO::PARAM_STR);
+                $query->bindParam(':regdate',$regdate,PDO::PARAM_STR);
                 $query->bindParam(':policy',$policy,PDO::PARAM_INT);
                 
                 $query->execute();
@@ -118,6 +122,10 @@ if(strlen($_SESSION['alogin'])==0) {
                                                                 <input type="text" name="staffid" id="staffid" class="form-control"  required>
                                                             </div>
                                                             <div class="form-group">
+                                                                <label for="regdate">Registration Date</label>
+                                                                <input type="date" name="regdate" id="regdate" class="form-control"  required>
+                                                            </div>
+                                                            <div class="form-group">
                                                                 <label for="address">Home Address</label>
                                                                 <input type="text" name="address" id="address" class="form-control" >
                                                             </div>
@@ -128,6 +136,10 @@ if(strlen($_SESSION['alogin'])==0) {
                                                             <div class="form-group">
                                                                 <label for="email">Email</label>
                                                                 <input type="email" name="email" id="email" class="form-control" >
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="ol">Outstanding Leave</label>
+                                                                <input type="number" min="0" name="ol" id="ol" class="form-control" >
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="password">Password</label>
@@ -156,7 +168,7 @@ if(strlen($_SESSION['alogin'])==0) {
 
                                                 <div class="form-actions">
                                                     <button name="add" onclick="return confirm('confirm creation');"  type="submit" class="btn btn-primary">
-                                                        <i class="fa fa-check-square-o"></i> Save</button>
+                                                        <i class="fa fa-check-square-o"></i> Submit</button>
                                                 </div>
                                             </form>
                                         </div>

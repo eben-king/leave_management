@@ -15,7 +15,10 @@
         <li><a class="menu-item" href="leaves.php" data-i18n="nav.dash.ecommerce">All Leaves</a>
         </li>
         <li><a class="menu-item" href="pendingleaves.php" data-i18n="nav.dash.ecommerce">Pending Leaves</a>
-        </li>
+        </li><?php if (isset($_SESSION['hodid'])) { ?>
+          <li><a class="menu-item" href="amendedleaves.php" data-i18n="nav.dash.ecommerce">Amended Leaves</a>
+          </li>
+        <?php } ?>
          <li><a class="menu-item" href="recommendedleaves.php" data-i18n="nav.dash.ecommerce">Recommended Leaves</a>
          </li>
          <li><a class="menu-item" href="rejectedleaves.php" data-i18n="nav.dash.ecommerce">Not Recommended Leaves</a>
